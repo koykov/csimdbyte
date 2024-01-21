@@ -4,7 +4,7 @@
 #include "index_sse4.h"
 #include "cmp.h"
 
-int index_sse4_long(const char *s, int sz, const char *ss, int ssz) {
+int inline index_sse4_long(const char *s, int sz, const char *ss, int ssz) {
     const __m128i N = _mm_loadu_si128((__m128i*)ss);
 
     for (int i = 0; i < sz; i += 16) {
@@ -25,7 +25,7 @@ int index_sse4_long(const char *s, int sz, const char *ss, int ssz) {
     }
 }
 
-int index_sse4_cmpfn(const char* s, int sz, const char* ss, int ssz, cmpfn fn) {
+int inline index_sse4_cmpfn(const char* s, int sz, const char* ss, int ssz, cmpfn fn) {
     const __m128i N = _mm_loadu_si128((__m128i*)ss);
     for (size_t i = 0; i < sz; i += 16) {
         const int mode = _SIDD_UBYTE_OPS

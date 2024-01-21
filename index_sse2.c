@@ -98,6 +98,6 @@ int index_sse2(const char *s, int sz, const char *ss, int ssz) {
             pos = index_sse2_long(s, sz, ss, ssz);
             break;
     }
-    if (pos > sz-ssz) pos = -1; 
+    if (pos > sz-ssz) pos = -1;
     return pos;
 }
