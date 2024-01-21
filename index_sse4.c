@@ -4,7 +4,7 @@
 #include "index_sse4.h"
 #include "cmp.h"
 
-int inline index_sse4_long(const char *s, int sz, const char *ss, int ssz) {
+inline int __attribute__((always_inline)) index_sse4_long(const char *s, int sz, const char *ss, int ssz) {
     const __m128i N = _mm_loadu_si128((__m128i*)ss);
 
     for (int i = 0; i < sz; i += 16) {
@@ -25,9 +25,9 @@ int inline index_sse4_long(const char *s, int sz, const char *ss, int ssz) {
     }
 }
 
-int inline index_sse4_cmpfn(const char* s, int sz, const char* ss, int ssz, cmpfn fn) {
+inline int __attribute__((always_inline)) index_sse4_cmpfn(const char* s, int sz, const char* ss, int ssz, cmpfn fn) {
     const __m128i N = _mm_loadu_si128((__m128i*)ss);
-    for (size_t i = 0; i < sz; i += 16) {
+    for (int i = 0; i < sz; i += 16) {
         const int mode = _SIDD_UBYTE_OPS
                          | _SIDD_CMP_EQUAL_ORDERED
                          | _SIDD_BIT_MASK;
@@ -49,13 +49,13 @@ int inline index_sse4_cmpfn(const char* s, int sz, const char* ss, int ssz, cmpf
 
 int index_sse4(const char *s, int sz, const char *ss, int ssz) {
     if (sz < ssz) { return -1; }
-    int pos = -1;
+    int pos;
     switch (ssz) {
         case 0:
             return 0;
         case 1: {
             const char *res = (const char *) (strchr(s, ss[0]));
-            return (res != NULL) ? res - s : -1;
+            return (res != NULL) ? (int)(res - s) : -1;
         }
         case 2:
             pos = index_sse4_cmpfn(s, sz, ss, ssz, cmp0);

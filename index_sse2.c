@@ -4,7 +4,7 @@
 #include "index_sse2.h"
 #include "cmp.h"
 
-int index_sse2_long(const char *s, int sz, const char *ss, int ssz) {
+inline int __attribute__((always_inline)) index_sse2_long(const char *s, int sz, const char *ss, int ssz) {
     const __m128i first = _mm_set1_epi8(ss[0]);
     const __m128i last  = _mm_set1_epi8(ss[ssz - 1]);
 
@@ -26,11 +26,11 @@ int index_sse2_long(const char *s, int sz, const char *ss, int ssz) {
     }
 }
 
-int index_sse2_cmpfn(const char* s, int sz, const char* ss, int ssz, cmpfn fn) {
+inline int __attribute__((always_inline)) index_sse2_cmpfn(const char* s, int sz, const char* ss, int ssz, cmpfn fn) {
     const __m128i first = _mm_set1_epi8(ss[0]);
     const __m128i last  = _mm_set1_epi8(ss[ssz - 1]);
 
-    for (size_t i = 0; i < sz; i += 16) {
+    for (int i = 0; i < sz; i += 16) {
         const __m128i block_first = _mm_loadu_si128((__m128i*)(s + i));
         const __m128i block_last  = _mm_loadu_si128((__m128i*)(s + i + ssz - 1));
 
@@ -53,13 +53,13 @@ int index_sse2_cmpfn(const char* s, int sz, const char* ss, int ssz, cmpfn fn) {
 
 int index_sse2(const char *s, int sz, const char *ss, int ssz) {
     if (sz < ssz) { return -1; }
-    int pos = -1;
+    int pos;
     switch (ssz) {
         case 0:
             return 0;
         case 1: {
             const char *res = (const char *) (strchr(s, ss[0]));
-            return (res != NULL) ? res - s : -1;
+            return (res != NULL) ? (int)(res - s) : -1;
         }
         case 2:
             pos = index_sse2_cmpfn(s, sz, ss, ssz, cmp0);
