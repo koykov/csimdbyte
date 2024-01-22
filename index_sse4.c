@@ -4,13 +4,12 @@
 #include "index_sse4.h"
 #include "cmp.h"
 
-inline int __attribute__((always_inline)) index_sse4_long(const char *s, int sz, const char *ss, int ssz) {
+inline size_t __attribute__((always_inline)) index_sse4_long(const char *s, size_t sz, const char *ss, size_t ssz) {
     const __m128i N = _mm_loadu_si128((__m128i*)ss);
 
-    for (int i = 0; i < sz; i += 16) {
+    for (size_t i = 0; i < sz; i += 16) {
         const int mode = _SIDD_UBYTE_OPS
-                         | _SIDD_CMP_EQUAL_ORDERED
-                         | _SIDD_BIT_MASK;
+                         | _SIDD_CMP_EQUAL_ORDERED;
         const __m128i D   = _mm_loadu_si128((__m128i*)(s + i));
         const __m128i res = _mm_cmpestrm(N, ssz, D, sz - i, mode);
         uint64_t mask = _mm_cvtsi128_si64(res);
@@ -25,12 +24,11 @@ inline int __attribute__((always_inline)) index_sse4_long(const char *s, int sz,
     }
 }
 
-inline int __attribute__((always_inline)) index_sse4_cmpfn(const char* s, int sz, const char* ss, int ssz, cmpfn fn) {
+inline size_t __attribute__((always_inline)) index_sse4_cmpfn(const char* s, size_t sz, const char* ss, size_t ssz, cmpfn fn) {
     const __m128i N = _mm_loadu_si128((__m128i*)ss);
-    for (int i = 0; i < sz; i += 16) {
+    for (size_t i = 0; i < sz; i += 16) {
         const int mode = _SIDD_UBYTE_OPS
-                         | _SIDD_CMP_EQUAL_ORDERED
-                         | _SIDD_BIT_MASK;
+                         | _SIDD_CMP_EQUAL_ORDERED;
         const __m128i D   = _mm_loadu_si128((__m128i*)(s + i));
         const __m128i res = _mm_cmpestrm(N, ssz, D, sz - i, mode);
         uint64_t mask = _mm_cvtsi128_si64(res);
@@ -47,9 +45,9 @@ inline int __attribute__((always_inline)) index_sse4_cmpfn(const char* s, int sz
     return -1;
 }
 
-int index_sse4(const char *s, int sz, const char *ss, int ssz) {
+size_t index_sse4(const char *s, size_t sz, const char *ss, size_t ssz) {
     if (sz < ssz) { return -1; }
-    int pos;
+    size_t pos;
     switch (ssz) {
         case 0:
             return 0;

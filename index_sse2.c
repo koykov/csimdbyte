@@ -4,11 +4,11 @@
 #include "index_sse2.h"
 #include "cmp.h"
 
-inline int __attribute__((always_inline)) index_sse2_long(const char *s, int sz, const char *ss, int ssz) {
+inline size_t __attribute__((always_inline)) index_sse2_long(const char *s, size_t sz, const char *ss, size_t ssz) {
     const __m128i first = _mm_set1_epi8(ss[0]);
     const __m128i last  = _mm_set1_epi8(ss[ssz - 1]);
 
-    for (int i = 0; i < sz; i += 16) {
+    for (size_t i = 0; i < sz; i += 16) {
         const __m128i block_first = _mm_loadu_si128((__m128i*)(s + i));
         const __m128i block_last  = _mm_loadu_si128((__m128i*)(s + i + ssz - 1));
 
@@ -26,11 +26,11 @@ inline int __attribute__((always_inline)) index_sse2_long(const char *s, int sz,
     }
 }
 
-inline int __attribute__((always_inline)) index_sse2_cmpfn(const char* s, int sz, const char* ss, int ssz, cmpfn fn) {
+inline size_t __attribute__((always_inline)) index_sse2_cmpfn(const char* s, size_t sz, const char* ss, size_t ssz, cmpfn fn) {
     const __m128i first = _mm_set1_epi8(ss[0]);
     const __m128i last  = _mm_set1_epi8(ss[ssz - 1]);
 
-    for (int i = 0; i < sz; i += 16) {
+    for (size_t i = 0; i < sz; i += 16) {
         const __m128i block_first = _mm_loadu_si128((__m128i*)(s + i));
         const __m128i block_last  = _mm_loadu_si128((__m128i*)(s + i + ssz - 1));
 
@@ -51,9 +51,9 @@ inline int __attribute__((always_inline)) index_sse2_cmpfn(const char* s, int sz
     return -1;
 }
 
-int index_sse2(const char *s, int sz, const char *ss, int ssz) {
+size_t index_sse2(const char *s, size_t sz, const char *ss, size_t ssz) {
     if (sz < ssz) { return -1; }
-    int pos;
+    size_t pos;
     switch (ssz) {
         case 0:
             return 0;
