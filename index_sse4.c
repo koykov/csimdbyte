@@ -11,7 +11,7 @@ inline size_t __attribute__((always_inline)) index_sse4_long(const char *s, size
         const int mode = _SIDD_UBYTE_OPS
                          | _SIDD_CMP_EQUAL_ORDERED;
         const __m128i D   = _mm_loadu_si128((__m128i*)(s + i));
-        const __m128i res = _mm_cmpestrm(N, ssz, D, sz - i, mode);
+        const __m128i res = _mm_cmpestrm(N, (int)ssz, D, (int)(sz - i), mode);
         uint64_t mask = _mm_cvtsi128_si64(res);
 
         while (mask != 0) {
@@ -30,7 +30,7 @@ inline size_t __attribute__((always_inline)) index_sse4_cmpfn(const char* s, siz
         const int mode = _SIDD_UBYTE_OPS
                          | _SIDD_CMP_EQUAL_ORDERED;
         const __m128i D   = _mm_loadu_si128((__m128i*)(s + i));
-        const __m128i res = _mm_cmpestrm(N, ssz, D, sz - i, mode);
+        const __m128i res = _mm_cmpestrm(N, (int)ssz, D, (int)(sz - i), mode);
         uint64_t mask = _mm_cvtsi128_si64(res);
 
         while (mask != 0) {
