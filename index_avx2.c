@@ -4,11 +4,11 @@
 #include "index_avx2.h"
 #include "cmp.h"
 
-inline size_t __attribute__((always_inline)) index_avx2_long(const char* s, size_t sz, const char* ss, size_t ssz) {
+inline int64_t __attribute__((always_inline)) index_avx2_long(const char* s, int64_t sz, const char* ss, int64_t ssz) {
     const __m256i first = _mm256_set1_epi8(ss[0]);
     const __m256i last  = _mm256_set1_epi8(ss[ssz - 1]);
 
-    for (size_t i = 0; i < sz; i += 32) {
+    for (int64_t i = 0; i < sz; i += 32) {
         const __m256i block_first = _mm256_loadu_si256((const __m256i*)(s + i));
         const __m256i block_last  = _mm256_loadu_si256((const __m256i*)(s + i + ssz - 1));
 
@@ -28,20 +28,20 @@ inline size_t __attribute__((always_inline)) index_avx2_long(const char* s, size
     return -1;
 }
 
-inline size_t __attribute__((always_inline)) index_2_avx2(const char* s, size_t sz, const char* ss, size_t ssz) {
+inline int64_t __attribute__((always_inline)) index_2_avx2(const char* s, int64_t sz, const char* ss, int64_t ssz) {
     __m256i broadcasted[ssz];
     for (unsigned i=0; i < ssz; i++) {
         broadcasted[i] = _mm256_set1_epi8(ss[i]);
     }
 
     __m256i curr = _mm256_loadu_si256((const __m256i*)(s));
-    for (size_t i = 0; i < sz; i += 32) {
+    for (int64_t i = 0; i < sz; i += 32) {
         const __m256i next = _mm256_loadu_si256((const __m256i*)(s + i + 32));
         __m256i eq = _mm256_cmpeq_epi8(curr, broadcasted[0]);
         __m256i next1;
         next1 = _mm256_inserti128_si256(next1, _mm256_extracti128_si256(curr, 1), 0); // b
         next1 = _mm256_inserti128_si256(next1, _mm256_extracti128_si256(next, 0), 1); // c
-        for (size_t j=1; j < ssz; j++) {
+        for (int64_t j=1; j < ssz; j++) {
             const __m256i substring = _mm256_alignr_epi8(next1, curr, (int)j);
             eq = _mm256_and_si256(eq, _mm256_cmpeq_epi8(substring, broadcasted[j]));
         }
@@ -56,11 +56,11 @@ inline size_t __attribute__((always_inline)) index_2_avx2(const char* s, size_t 
     return -1;
 }
 
-inline size_t __attribute__((always_inline)) index_avx2_cmpfn(const char* s, size_t sz, const char* ss, size_t ssz, cmpfn fn) {
+inline int64_t __attribute__((always_inline)) index_avx2_cmpfn(const char* s, int64_t sz, const char* ss, int64_t ssz, cmpfn fn) {
     const __m256i first = _mm256_set1_epi8(ss[0]);
     const __m256i last  = _mm256_set1_epi8(ss[ssz - 1]);
 
-    for (size_t i = 0; i < sz; i += 32) {
+    for (int64_t i = 0; i < sz; i += 32) {
         const __m256i block_first = _mm256_loadu_si256((const __m256i*)(s + i));
         const __m256i block_last  = _mm256_loadu_si256((const __m256i*)(s + i + ssz - 1));
 
@@ -80,9 +80,9 @@ inline size_t __attribute__((always_inline)) index_avx2_cmpfn(const char* s, siz
     return -1;
 }
 
-size_t index_avx2(const char *s, size_t sz, const char *ss, size_t ssz) {
+int64_t index_avx2(const char *s, int64_t sz, const char *ss, int64_t ssz) {
     if (sz < ssz) { return -1; }
-    size_t pos;
+    int64_t pos;
     switch (ssz) {
         case 0:
             return 0;
