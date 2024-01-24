@@ -1,14 +1,37 @@
+#include <dirent.h>
 #include <stdio.h>
 #include <string.h>
 #include "index_sse2.h"
 #include "index_sse4.h"
 #include "index_avx2.h"
 
+struct stage_t {
+    char *name;
+    int idx;
+    char *body;
+    char *needle;
+    int res;
+};
+
 int64_t len(const char *s) {
     return (int64_t)strlen(s);
 }
 
 int main(void) {
+    DIR *d;
+    struct dirent *dir;
+    d = opendir("../testdata");
+    if (d) {
+        while ((dir = readdir(d)) != NULL) {
+            if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0 || strstr(dir->d_name, ".txt") != NULL) {
+                continue;
+            }
+            printf("%s\n", dir->d_name); // todo parse stages
+        }
+        closedir(d);
+    }
+    return 0;
+
     const char *l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum sed eros fringilla, porttitor erat sed, tempus quam. Vivamus vitae convallis sem, et rutrum arcu. Fusce eu vehicula diam. Nulla pulvinar fermentum lacus. Nulla orci leo, auctor nec nisl eget, aliquam consequat orci. Donec ultrices laoreet metus, eu auctor sapien sollicitudin eget. In ornare molestie ullamcorper. Donec ac purus nec leo placerat tincidunt. Phasellus sed enim odio. Nam erat nisl, placerat sit amet ultrices in, vulputate eu est. In vestibulum fringilla mauris, non tincidunt diam gravida vel. Proin est nisi, elementum sed risus vel, porttitor porttitor elit!";
     const char *ss = "!";
     const char *ss1 = "purus";
