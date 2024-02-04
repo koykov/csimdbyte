@@ -18,14 +18,17 @@ int64_t len(const char *s) {
     return (int64_t)strlen(s);
 }
 
-int main(void) {
+int main(int argc, char *argv[]) {
+    if (argc < 2) return 0;
+    char *path = argv[1];
+
     struct stage_t *stg;
     stg = calloc(1000, sizeof(struct stage_t));
     int stgc = 0;
 
     DIR *d;
     struct dirent *dir;
-    d = opendir("../testdata");
+    d = opendir(path);
     if (d) {
         while ((dir = readdir(d)) != NULL) {
             if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0 || strstr(dir->d_name, ".txt") != NULL) {
@@ -39,7 +42,8 @@ int main(void) {
             ssize_t n;
 
             char buf[1000];
-            strcpy(buf, "../testdata/");
+            strcpy(buf, path);
+            strcat(buf, "/");
             strcat(buf, dir->d_name);
             fp = fopen(buf, "r");
             if (fp == NULL) continue;
