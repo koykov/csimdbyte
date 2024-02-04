@@ -45,7 +45,9 @@ int main(void) {
             if (fp == NULL) continue;
 
             while ((n = getline(&line, &len, fp)) != -1) {
-                printf("%s", line);
+                char *left = strtok(line, "#");
+                char *right = strtok(NULL, "#");
+                printf("%s - %s\n", left, right);
             }
 
             fclose(fp);
