@@ -1,6 +1,7 @@
 #include <dirent.h>
 #include <stdio.h>
 #include <string.h>
+#include <malloc.h>
 #include "index_sse2.h"
 #include "index_sse4.h"
 #include "index_avx2.h"
@@ -18,6 +19,10 @@ int64_t len(const char *s) {
 }
 
 int main(void) {
+    struct stage_t *stg;
+    stg = calloc(1000, sizeof(struct stage_t));
+    int stgc = 0;
+
     DIR *d;
     struct dirent *dir;
     d = opendir("../testdata");
@@ -27,9 +32,30 @@ int main(void) {
                 continue;
             }
             printf("%s\n", dir->d_name); // todo parse stages
+
+            FILE *fp;
+            char *line = NULL;
+            size_t len = 0;
+            ssize_t n;
+
+            char buf[1000];
+            strcpy(buf, "../testdata/");
+            strcat(buf, dir->d_name);
+            fp = fopen(buf, "r");
+            if (fp == NULL) continue;
+
+            while ((n = getline(&line, &len, fp)) != -1) {
+                printf("%s", line);
+            }
+
+            fclose(fp);
+            if (line)
+                free(line);
         }
         closedir(d);
     }
+
+    free(stg);
     return 0;
 
     const char *l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum sed eros fringilla, porttitor erat sed, tempus quam. Vivamus vitae convallis sem, et rutrum arcu. Fusce eu vehicula diam. Nulla pulvinar fermentum lacus. Nulla orci leo, auctor nec nisl eget, aliquam consequat orci. Donec ultrices laoreet metus, eu auctor sapien sollicitudin eget. In ornare molestie ullamcorper. Donec ac purus nec leo placerat tincidunt. Phasellus sed enim odio. Nam erat nisl, placerat sit amet ultrices in, vulputate eu est. In vestibulum fringilla mauris, non tincidunt diam gravida vel. Proin est nisi, elementum sed risus vel, porttitor porttitor elit!";
