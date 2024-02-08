@@ -51,7 +51,11 @@ int main(int argc, char *argv[]) {
             while ((n = getline(&line, &len, fp)) != -1) {
                 char *left = strtok(line, "#");
                 char *right = strtok(NULL, "#");
-                printf("%s - %s\n", left, right);
+                if (right == NULL) {
+                    left = "";
+                    right = "0";
+                }
+                printf("%s --- %s\n", left, right);
             }
 
             fclose(fp);
